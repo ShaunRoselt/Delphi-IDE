@@ -1,6 +1,3 @@
-import './index.css'
-import './App.css'
-
 import { renderShell } from './render/shell.js'
 import { wireAll } from './wire/index.js'
 import { persistState } from './state.js'
