@@ -1,6 +1,6 @@
 # Delphi-IDE
 
-A browser-based UI prototype of Embarcadero RAD Studio 13 / Delphi. Lays out a form visually, edits the generated Object Pascal source, and runs simple event handlers — all client-side, no install, no backend.
+A browser-based UI prototype of Embarcadero RAD Studio 12 / Delphi. Lays out a form visually, edits the generated Object Pascal source, and runs simple event handlers — all client-side, no install, no backend.
 
 Live preview: [delphi.test.shaunroselt.com](https://delphi.test.shaunroselt.com)
 
