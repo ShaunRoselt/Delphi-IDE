@@ -21,18 +21,21 @@ Vanilla JavaScript ESM, no framework. Vite for dev/build. ESLint flat config. Re
 ## Project layout
 
 ```
+index.html               entry point — Vite mounts /src/main.js into #root
+vite.config.js           build config + production CSP injector
 src/
-  main.js              entry point — renders the shell and wires listeners
-  state.js             single store + localStorage persistence
-  data.js              VCL component catalog (props, events, palette categories)
-  pascal.js            tokenizer + syntax highlighter
-  compiler.js          lexer + parser + diagnostics for handler bodies
-  runtime.js           minimal Pascal interpreter for running forms
-  actions.js           state-mutating actions invoked by the UI
-  render/              pure render functions (shell, designer, inspector, code, ...)
-  wire/                event wiring per surface (keyboard, palette, designer, ...)
-  index.css, App.css   styles
-public/                static assets served as-is (favicon, icons)
+  main.js                renders the shell and wires listeners
+  state.js               single store + localStorage persistence
+  data.js                VCL component catalog (props, events, palette categories)
+  pascal.js              tokenizer + syntax highlighter
+  compiler.js            lexer + parser + diagnostics for handler bodies
+  runtime.js             minimal Pascal interpreter for running forms
+  actions.js             state-mutating actions invoked by the UI
+  render/                pure render functions (shell, designer, inspector, code, ...)
+  wire/                  event wiring per surface (keyboard, palette, designer, ...)
+  index.css, App.css     styles
+public/                  static assets copied verbatim into dist/ (favicon, icons, CNAME)
+.github/workflows/       CI — auto-builds and deploys to GitHub Pages on push to main
 ```
 
 ## Getting started
@@ -51,7 +54,45 @@ Open the dev server URL Vite prints (default `http://localhost:5173`).
 
 ## Deployment
 
-Static site — the contents of `dist/` can be hosted anywhere. The included `CNAME` deploys to `delphi.test.shaunroselt.com` via GitHub Pages.
+Every push to `main` is built and published to [delphi.test.shaunroselt.com](https://delphi.test.shaunroselt.com) automatically by `.github/workflows/deploy.yml`:
+
+1. Checkout
+2. `npm ci` → `npm run lint` → `npm run build`
+3. Upload `dist/` as a Pages artifact
+4. `actions/deploy-pages` publishes it
+
+One-time GitHub setup (Settings → Pages):
+
+- **Source**: *GitHub Actions* (not "Deploy from a branch")
+- **Custom domain**: `delphi.test.shaunroselt.com` (Vite copies `public/CNAME` into `dist/` on every build, so this stays in sync)
+- **Enforce HTTPS**: on
+
+To deploy manually, run the workflow from the Actions tab (`workflow_dispatch`).
+
+## Security
+
+This is a public, static, single-origin app with no backend and no third-party scripts. The threat surface is small, but the public exposure deserves attention. What's in place:
+
+- **Strict Content-Security-Policy** injected at build time (`vite.config.js`):
+  - `default-src 'self'` — no third-party origins.
+  - `script-src 'self'` — no inline scripts, no `eval`, no remote JS.
+  - `style-src 'self' 'unsafe-inline'` — inline styles are required for designer component positioning; no remote stylesheets.
+  - `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, `connect-src 'self'`, `manifest-src 'self'`.
+- **Referrer-Policy** `strict-origin-when-cross-origin` via meta tag.
+- **HTML escaping** for any user-controlled string rendered into the DOM (`escapeHtml` in `util.js`, used consistently across `render/` and diagnostic output). The Pascal highlighter tokenises before emitting HTML so it cannot be tricked by a user-supplied `class="..."` substring.
+- **No `eval`, no `Function(...)`** in the runtime — the Pascal interpreter walks tokens, it does not generate JavaScript.
+- **HTTPS** enforced by GitHub Pages on the custom domain.
+- **CI guardrail** — the deploy workflow runs `npm run lint` and fails the build on lint errors, so syntactically broken code can't reach production.
+- **No secrets** in the repo. The app has no API keys, no auth, no PII; all user state lives in `localStorage` on the visitor's own device.
+
+What GitHub Pages can't enforce (header-only directives) and would need a CDN/reverse proxy in front of Pages to add:
+
+- `X-Frame-Options` / CSP `frame-ancestors` (clickjacking — low impact here since there are no auth-gated, state-changing actions)
+- `Strict-Transport-Security` (HSTS — Pages already redirects HTTP → HTTPS)
+- `X-Content-Type-Options: nosniff`
+- `Permissions-Policy`
+
+If those become important, put the site behind Cloudflare (or similar) and add a Transform Rule / response-header rule there.
 
 ## Status
 
