@@ -1,40 +1,44 @@
 import { listItems } from '../util.js'
 
-const WELCOME_CREATE = [
-  ['Windows VCL Application - Delphi', 'A UI app using Windows native controls and the VCL framework.'],
-  ['Multi-Device Application - Delphi', 'A UI app for desktop and mobile devices using FireMonkey.'],
+const WELCOME_CREATE_FMX = [
+  ['Multi-Device Application - Delphi', 'A cross-platform app for Windows, macOS, iOS, Android, and Linux using FireMonkey.'],
+  ['FireMonkey HD Application - Delphi', 'A high-DPI desktop application using the FireMonkey framework.'],
+  ['FMX Mobile Application - Delphi', 'A mobile-first app targeting iOS and Android with FireMonkey.'],
+  ['Console Application - Delphi', 'A command-line application with no UI.'],
   ['Package - Delphi', 'A smart dynamically loaded library carrying extra metadata.'],
-  ['Console Application - Delphi', 'A command-line app.'],
-  ['Dynamic Library - Delphi', 'A library that can be loaded and unloaded.'],
   ['DUnitX Project - Delphi', 'Create a new DUnitX test project.'],
+]
+
+const WELCOME_CREATE_VCL = [
+  ['Windows VCL Application - Delphi', 'A UI app using Windows native controls and the VCL framework.'],
   ['VCL Form - Delphi', 'A classic Windows form unit.'],
-  ['VCL Frame - Delphi', 'Reusable controls for another form or frame.'],
+  ['VCL Frame - Delphi', 'Reusable VCL controls for another form or frame.'],
 ]
 
 const RECENT_PROJECTS = [
-  ['Project1.dproj', 'C:\\Users\\Developer\\Documents\\Embarcadero\\Studio\\Projects\\Project1\\'],
-  ['NewNotOperators.dproj', 'C:\\Users\\Alister\\Documents\\Embarcadero\\Studio\\Projects\\NewOperators\\'],
-  ['TernaryOperator.dproj', 'C:\\Users\\Alister\\Documents\\Embarcadero\\Studio\\Projects\\TernaryOperator\\'],
+  ['FMXApp1.dproj', 'C:\\Users\\Developer\\Documents\\Embarcadero\\Studio\\Projects\\FMXApp1\\'],
+  ['CrossPlatformUI.dproj', 'C:\\Users\\Alister\\Documents\\Embarcadero\\Studio\\Projects\\CrossPlatformUI\\'],
+  ['MobileDemo.dproj', 'C:\\Users\\Alister\\Documents\\Embarcadero\\Studio\\Projects\\MobileDemo\\'],
 ]
 
 const LEARN_ITEMS = [
-  ['RAD Studio 12 Athens', 'New language, editor, and productivity features.'],
-  ['Getting real help for Delphi', 'Find docs, samples, tools, and source packages.'],
-  ['AI assistant integrations', 'Build practical app assistants and connected tooling.'],
-  ['Recreating a TListView', 'Responsive layouts, controls, and modern UI techniques.'],
-  ['Conferences & community', 'Learn about events and community resources.'],
-  ['Apps for small screens', 'Responsive FireMonkey design guidance.'],
+  ['FireMonkey Multi-Device Apps', 'Build apps that run on Windows, macOS, iOS, Android, and Linux.'],
+  ['FMX Layouts & Styling', 'Use TLayout, TGridLayout, and styles for adaptive UIs.'],
+  ['FireMonkey Animation System', 'Create fluid transitions and animations with TAnimation.'],
+  ['LiveBindings in FMX', 'Connect UI controls to data sources without boilerplate code.'],
+  ['Cross-Platform File & Camera', 'Access the file system, camera, and sensors on all FMX platforms.'],
+  ['RAD Studio 12 Athens', 'New language, editor, and FireMonkey productivity features.'],
 ]
 
 const GETIT_ITEMS = [
-  ['Deleaker (Trial)', 'Find memory leaks, GDI leaks, and handle leaks.'],
-  ['ErrorSoft VCL Components', 'A free VCL component library for Delphi and C++Builder.'],
-  ['ICS for VCL', 'Internet components supporting major protocols.'],
+  ['FMXLinux', 'Full-feature FireMonkey implementation for Linux desktop and server.'],
+  ['TMS FMX UI Pack', 'A rich set of FireMonkey components for beautiful cross-platform UIs.'],
+  ['DDevExtensions', 'IDE productivity extensions for RAD Studio developers.'],
 ]
 
 const PROMOTED_ITEMS = [
   ['FMXLinux', 'Full feature FireMonkey implementation for Linux platform.'],
-  ['MMX Code Explorer', 'A refactoring browser for the Delphi IDE.'],
+  ['TMS FMX UI Pack', 'Professional FireMonkey components for all supported platforms.'],
 ]
 
 export function renderWelcomePage() {
@@ -53,9 +57,17 @@ export function renderWelcomePage() {
         <article class="welcome-card create-card">
           <h2>Create New</h2>
           <ul>
-            ${listItems(WELCOME_CREATE, ([title, text], index) => `
-              <li data-welcome-create="${index}">
-                <span class="create-icon icon-${index}">${title.slice(0, 1)}</span>
+            <li class="create-section-label">FireMonkey</li>
+            ${listItems(WELCOME_CREATE_FMX, ([title, text], index) => `
+              <li data-welcome-create="${index}" class="create-item-fmx">
+                <span class="create-icon icon-${index}">F</span>
+                <span><strong>${title}</strong><small>${text}</small></span>
+              </li>
+            `)}
+            <li class="create-section-label create-section-vcl">VCL <span class="coming-soon-badge">Coming Soon</span></li>
+            ${listItems(WELCOME_CREATE_VCL, ([title, text]) => `
+              <li class="create-item-vcl">
+                <span class="create-icon icon-vcl">V</span>
                 <span><strong>${title}</strong><small>${text}</small></span>
               </li>
             `)}
@@ -74,7 +86,7 @@ export function renderWelcomePage() {
           </ul>
         </article>
         <article class="welcome-card learn-card">
-          <h2>Learn</h2>
+          <h2>Learn FireMonkey</h2>
           <ul>
             ${listItems(LEARN_ITEMS, ([title, text], index) => `
               <li>

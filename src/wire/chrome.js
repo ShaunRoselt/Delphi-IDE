@@ -17,7 +17,7 @@ function handleAction(action, el) {
     renderApp()
     return
   }
-  if (action === 'help') { executeMenu('About Embarcadero RAD Studio'); return }
+  if (action === 'help') { executeMenu('About Embarcadero® Delphi'); return }
   if (action === 'reset-layout') { resetLayoutSizes(); state.statusMessage = 'Layout reset'; renderApp(); return }
   if (action === 'toggle-grid') { state.showGrid = el.checked; renderApp(); return }
   if (action === 'toggle-snap') { state.snapToGrid = el.checked; renderApp(); return }

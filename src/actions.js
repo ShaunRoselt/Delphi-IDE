@@ -291,6 +291,7 @@ export function executeMenu(label) {
       if (f) state.selection = f.components.length ? f.components.map((c) => c.id) : [f.name]
       break
     }
+    case 'Show Code/Designer':
     case 'Toggle Form/Unit':
       state.designerView = state.designerView === 'design' ? 'code' : 'design'
       break
@@ -310,6 +311,7 @@ export function executeMenu(label) {
     case 'Trace Into':
     case 'Run to Cursor': state.statusMessage = `Debug: ${clean}`; break
     case 'Welcome Page': openWelcomeTab(); break
+    case 'About Embarcadero® Delphi':
     case 'About Embarcadero RAD Studio':
       alert('RAD Studio 12 Athens (Web Prototype)\nVCL Form Designer · Object Inspector · Pascal Editor')
       return false
