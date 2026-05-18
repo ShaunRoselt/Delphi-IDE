@@ -1,5 +1,9 @@
 # Delphi-IDE
 
+<p align="center">
+  <img src="public/Delphi_Helm_Icon.png" alt="Delphi-IDE project icon" width="240" />
+</p>
+
 A browser-based UI prototype of Embarcadero RAD Studio 13 / Delphi. Lays out a form visually, edits the generated Object Pascal source, and runs simple event handlers — all client-side, no install, no backend, no build step.
 
 Live preview: [delphi.test.shaunroselt.com](https://delphi.test.shaunroselt.com)

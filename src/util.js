@@ -38,13 +38,3 @@ export function colorToCss(v) {
   }
   return '#f0f0f0'
 }
-
-export function getCaretOffset(node) {
-  const sel = window.getSelection()
-  if (!sel.rangeCount) return 0
-  const range = sel.getRangeAt(0)
-  const pre = range.cloneRange()
-  pre.selectNodeContents(node)
-  pre.setEnd(range.endContainer, range.endOffset)
-  return pre.toString().length
-}

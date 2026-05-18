@@ -1,5 +1,7 @@
 import { state, activeForm } from '../state.js'
-import { generatePascal, highlightPascal } from '../pascal.js'
+import {
+  generatePascal, highlightPascal, findProcedureLines,
+} from '../pascal.js'
 import { escapeHtml } from '../util.js'
 import { renderViewSwitcher } from './chrome.js'
 
@@ -18,26 +20,64 @@ function renderDiagnostics() {
   `).join('')
 }
 
+// Maps each diagnostic to its line; preserves error severity over warning.
+function diagnosticsByLine(diagnostics) {
+  const byLine = new Map()
+  for (const d of diagnostics || []) {
+    if (!byLine.has(d.line)) {
+      byLine.set(d.line, { worst: d.severity, items: [d] })
+    } else {
+      const entry = byLine.get(d.line)
+      entry.items.push(d)
+      if (d.severity === 'error') entry.worst = 'error'
+    }
+  }
+  return byLine
+}
+
+export function renderHighlight(src, diagnostics) {
+  const byLine = diagnosticsByLine(diagnostics)
+  return src.split('\n').map((line, i) => {
+    const entry = byLine.get(i + 1)
+    return highlightPascal(line, entry?.items || []) || ' '
+  }).join('\n')
+}
+
+export function renderGutter(src, diagnostics) {
+  const byLine = diagnosticsByLine(diagnostics)
+  const total = src.split('\n').length
+  let out = ''
+  for (let i = 1; i <= total; i++) {
+    const sev = byLine.get(i)?.worst
+    const cls = sev ? `code-line-num has-${sev}` : 'code-line-num'
+    out += `<div class="${cls}">${i}</div>`
+  }
+  return out
+}
+
 export function renderCodePage() {
   const f = activeForm()
   if (!f) return '<div class="empty-state">No form</div>'
-
   const src = generatePascal(f)
-  const diagnosticsByLine = new Map()
-  for (const d of state.diagnostics || []) {
-    if (!diagnosticsByLine.has(d.line)) diagnosticsByLine.set(d.line, d)
-  }
-  const highlighted = src.split('\n').map((line, i) =>
-    `<div class="code-line ${diagnosticsByLine.has(i + 1) ? `has-${diagnosticsByLine.get(i + 1).severity}` : ''}" data-line="${i + 1}"><span class="ln">${i + 1}</span><span class="code-text">${highlightPascal(line) || '&nbsp;'}</span></div>`,
-  ).join('')
-
+  const procs = findProcedureLines(src)
+  const navOptions = [
+    '<option value="0">(class declaration)</option>',
+    ...procs.map((p) => `<option value="${p.line}">${escapeHtml(p.qualified)}</option>`),
+  ].join('')
   return `
     <section class="code-page">
       <div class="code-toolbar">
-        <select><option>Search for a type</option></select>
-        <select><option>${escapeHtml(f.className)}</option><option>(class declaration)</option></select>
+        <select data-code-type-filter><option>Search for a type</option><option>${escapeHtml(f.className)}</option></select>
+        <select data-code-navigator>${navOptions}</select>
       </div>
-      <div class="code-editor" data-code-editor contenteditable="true" spellcheck="false">${highlighted}</div>
+      <div class="code-editor">
+        <div class="code-gutter" data-code-gutter>${renderGutter(src, state.diagnostics || [])}</div>
+        <div class="code-surface">
+          <pre class="code-highlight" data-code-highlight aria-hidden="true">${renderHighlight(src, state.diagnostics || [])}</pre>
+          <textarea class="code-input" data-code-input spellcheck="false" wrap="off" autocomplete="off" autocorrect="off" autocapitalize="off">${escapeHtml(src)}</textarea>
+        </div>
+      </div>
+      <div class="code-insight-popup" data-code-insight hidden></div>
       <section class="compiler-messages" data-compiler-messages>
         <header><strong>Messages</strong><span>${state.diagnostics?.length || 0} item(s)</span></header>
         <div class="diagnostic-list">${renderDiagnostics()}</div>

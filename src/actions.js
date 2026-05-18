@@ -1,5 +1,6 @@
 import {
-  state, activeForm, isFormSelected, persistState, snap,
+  state, activeForm, activeTab, isFormSelected, persistState, snap,
+  saveProjectSnapshot,
 } from './state.js'
 import { COMPONENT_DEFS, COMMON_PROPS, DEFAULT_EVENT } from './data.js'
 import { renderApp } from './main.js'
@@ -152,12 +153,59 @@ export function closeTab(id) {
   const idx = state.openTabs.findIndex((t) => t.id === id)
   if (idx === -1) return
   state.openTabs.splice(idx, 1)
-  if (state.activeTabId === id) {
-    state.activeTabId = state.openTabs[Math.max(0, idx - 1)]?.id || 'welcome'
+  if (state.openTabs.length === 0) {
+    state.openTabs.push({ id: 'welcome', kind: 'welcome', title: 'Welcome Page', formId: null })
+    state.activeTabId = 'welcome'
+    return
   }
+  if (state.activeTabId === id) {
+    state.activeTabId = state.openTabs[Math.max(0, idx - 1)]?.id || state.openTabs[0].id
+  }
+}
+
+export function openWelcomeTab() {
   if (!state.openTabs.find((t) => t.id === 'welcome')) {
     state.openTabs.unshift({ id: 'welcome', kind: 'welcome', title: 'Welcome Page', formId: null })
   }
+  state.activeTabId = 'welcome'
+}
+
+function saveProject() {
+  state.project ||= { name: 'Project1' }
+  if (saveProjectSnapshot(state.project.name)) {
+    persistState()
+    state.modified = false
+    state.statusMessage = `Project "${state.project.name}" saved`
+  } else {
+    state.statusMessage = 'Save failed'
+  }
+}
+
+function saveActiveUnitAs() {
+  const tab = activeTab()
+  if (!tab || tab.kind !== 'form') {
+    state.statusMessage = 'No unit to save'
+    return
+  }
+  const f = state.forms[tab.formId]
+  if (!f) return
+  const next = prompt('Save unit as:', f.unitName)
+  if (!next) return
+  const trimmed = next.trim().replace(/\.pas$/i, '')
+  if (!trimmed) return
+  f.unitName = trimmed
+  tab.title = trimmed
+  saveProject()
+}
+
+function saveProjectAs() {
+  state.project ||= { name: 'Project1' }
+  const next = prompt('Save project as:', state.project.name)
+  if (!next) return
+  const trimmed = next.trim().replace(/\.dproj$/i, '')
+  if (!trimmed) return
+  state.project.name = trimmed
+  saveProject()
 }
 
 export function selectTab(id) {
@@ -219,12 +267,14 @@ export function executeMenu(label) {
     case 'Open Project':
     case 'Open File': state.statusMessage = 'Open dialog (stub)'; break
     case 'Save':
-    case 'Save As':
-    case 'Save Project As':
     case 'Save All':
-      persistState()
-      state.modified = false
-      state.statusMessage = 'All files saved'
+      saveProject()
+      break
+    case 'Save As':
+      saveActiveUnitAs()
+      break
+    case 'Save Project As':
+      saveProjectAs()
       break
     case 'Close': closeTab(state.activeTabId); break
     case 'Close All':
@@ -259,7 +309,7 @@ export function executeMenu(label) {
     case 'Step Over':
     case 'Trace Into':
     case 'Run to Cursor': state.statusMessage = `Debug: ${clean}`; break
-    case 'Welcome Page': state.activeTabId = 'welcome'; break
+    case 'Welcome Page': openWelcomeTab(); break
     case 'About Embarcadero RAD Studio':
       alert('RAD Studio 12 Athens (Web Prototype)\nVCL Form Designer · Object Inspector · Pascal Editor')
       return false

@@ -4,9 +4,10 @@ import { escapeHtml, iconButton } from '../util.js'
 
 export function renderTitleBar() {
   const f = activeForm()
+  const projectName = state.project?.name || 'Project1'
   const title = f
-    ? `${f.unitName}.pas - ${f.className} - RAD Studio 12 Web Prototype${state.modified ? ' *' : ''}`
-    : 'RAD Studio 12 Web Prototype'
+    ? `${projectName} - ${f.unitName}.pas - ${f.className} - RAD Studio 12 Web Prototype${state.modified ? ' *' : ''}`
+    : `${projectName} - RAD Studio 12 Web Prototype`
   return `
     <header class="titlebar">
       <div class="app-badge">RAD</div>
@@ -80,7 +81,7 @@ export function renderToolbar() {
 }
 
 export function renderDocumentTabs() {
-  return `<div class="document-tabs">${state.openTabs.map((t) => `<button class="${state.activeTabId === t.id ? 'active' : ''} ${t.kind}-tab" data-tab="${t.id}">${escapeHtml(t.title)}${t.id !== 'welcome' ? `<span class="tab-close" data-close-tab="${t.id}" title="Close">×</span>` : ''}</button>`).join('')}<button class="add-tab" title="New form" data-action="newform">+</button></div>`
+  return `<div class="document-tabs">${state.openTabs.map((t) => `<button class="${state.activeTabId === t.id ? 'active' : ''} ${t.kind}-tab" data-tab="${t.id}">${escapeHtml(t.title)}<span class="tab-close" data-close-tab="${t.id}" title="Close">×</span></button>`).join('')}<button class="add-tab" title="New form" data-action="newform">+</button></div>`
 }
 
 export function renderStatusBar() {

@@ -1,70 +1,76 @@
 <claude-mem-context>
 # Memory Context
 
-# [Delphi-IDE] recent context, 2026-05-17 8:56pm GMT+2
+# [Delphi-IDE] recent context, 2026-05-18 2:22pm GMT+2
 
 Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
 Format: ID TIME TYPE TITLE
 Fetch details: get_observations([IDs]) | Search: mem-search skill
 
-Stats: 46 obs (14,891t read) | 141,313t work | 89% savings
+Stats: 50 obs (16,058t read) | 287,236t work | 94% savings
 
 ### May 17, 2026
-1458 8:03p ⚖️ User preference: no co-authors in GitHub commits
-S505 Remove co-authors/co-writers from GitHub commits; establish commit trailer policy for Delphi-IDE (May 17, 8:04 PM)
-S504 Remove co-authors/co-writers from GitHub commits in the Delphi-IDE project (May 17, 8:04 PM)
-1459 8:04p ✅ Commit trailer policy saved for Delphi-IDE project
-S506 Remove Claude co-author trailers from commits; credit both Shaun Roselt and Atster10 as co-authors in Delphi-IDE (May 17, 8:05 PM)
-1460 8:05p ✅ Commit co-author policy corrected: Shaun Roselt and Atster10 are two separate people
-S507 Clarification on whether emails are required in Co-Authored-By trailers (May 17, 8:05 PM)
-S508 Switch co-author emails to GitHub noreply format for privacy in Delphi-IDE commits (May 17, 8:06 PM)
-1461 8:07p ✅ Commit co-author emails switched to GitHub noreply format for privacy
 S509 Write a comprehensive README.md for the Delphi-IDE project (May 17, 8:07 PM)
-1462 8:09p 🔵 Delphi-IDE is a Vite-based web project with minimal initial content
-1463 " 🔵 Delphi-IDE is a RAD Studio 13 UI prototype built with vanilla Vite, zero runtime dependencies
-1464 8:10p 🔵 Delphi-IDE is a feature-rich RAD Studio 13 IDE prototype with Pascal compiler, designer, and runtime
-1465 " 🔵 Pascal runtime is a minimal interpreter for event handler bodies, not a full compiler
-1466 " 🟣 README.md expanded from stub to full project documentation
 S510 Delphi-IDE: Wire up automated GitHub Pages deployment with security hardening for public URL (delphi.test.shaunroselt.com) (May 17, 8:11 PM)
-1467 8:16p 🔵 Delphi-IDE render directory contains no innerHTML or template interpolation
-1468 " 🔵 Delphi-IDE XSS surface: src/wire/code.js uses innerHTML without escapeHtml
-1469 " 🔵 wire/code.js XSS risk revised: escapeHtml IS used on user-data fields; d.line/d.col unescaped but numeric
-1470 8:17p ✅ CNAME moved to public/ for Vite dist inclusion; GitHub workflows directory created
-1471 " 🟣 CSP injected into index.html at build time via custom Vite plugin
-1472 " 🟣 index.html hardened with referrer policy and color-scheme meta tags
-1473 " 🟣 GitHub Actions workflow created for automated Vite build and GitHub Pages deployment
-1474 " 🔵 Delphi-IDE project architecture: vanilla JS ESM with render/wire split and single state store
-1475 8:18p ✅ README project layout updated to reflect new files and infrastructure
-1476 " ✅ README expanded with full Deployment instructions and comprehensive Security section
-1477 " 🔵 Production build verified clean with CSP injection; 88 packages, 45ms build time
-1478 " 🔵 Full deployment build verified: CSP in dist/index.html, CNAME copied, lint passes clean
 S511 Fix white screen on Delphi-IDE GitHub Pages site (delphi.test.shaunroselt.com) by adjusting code only, no build pipeline (May 17, 8:18 PM)
-1479 8:25p 🔵 Delphi IDE prototype site returns near-empty HTML causing white screen
-1480 " 🔵 Delphi IDE deployed to GitHub Pages without a build step -- serving raw Vite source
-1481 8:27p 🔵 src/main.js uses CSS imports -- requires bundler, cannot run natively in browser
-1482 " ⚖️ Pivoted away from GitHub Actions build pipeline -- modifying source to work without bundling
-1483 " 🔴 Fixed white screen by replacing Vite CSS imports with native HTML link tags and hardcoding CSP
-1484 8:28p 🔵 Local static server confirms all assets resolve correctly with the no-build approach
-1485 " 🔵 README.md describes deleted GitHub Actions workflow -- now outdated after no-build pivot
-1486 " ✅ README.md updated to document no-build GitHub Pages deployment architecture
-1487 " 🔵 Final changeset has mixed staged/unstaged state -- requires git add before commit
-1488 8:31p 🔵 All 5 changed files now staged and ready to commit
-1489 " 🔵 Delphi-IDE GitHub repo is ShaunRoselt/Delphi-IDE on github.com
-1490 " 🔵 GitHub push auth works without explicit credential helper -- current HEAD is bf66a58
-1491 8:35p ✅ All changes staged cleanly with git add -A -- commit ready
-1492 " 🔴 Committed fix for white screen -- commit 234a672 pushed to main
-1493 " 🔵 Push rejected -- remote main has commits ahead of local branch
-1494 8:36p 🔵 Local branch has 3 unpushed commits including two prior white-screen fix attempts; remote has 1 diverging commit
-1495 " 🔵 Remote bf66a58 only changed "RAD Studio 12" to "RAD Studio 13" -- local README already incorporates this change
-1496 " ✅ Merged origin/main into local main -- merge commit b3258f2 ready to push
-1497 " 🔴 White screen fix successfully pushed to GitHub Pages -- commit b3258f2 now live
+S512 Fix white screen on Delphi-IDE GitHub Pages site (delphi.test.shaunroselt.com) by adjusting code only -- completed and pushed (May 17, 8:29 PM)
+1497 8:36p 🔴 White screen fix successfully pushed to GitHub Pages -- commit b3258f2 now live
 1498 " 🔵 GitHub Pages CDN still serving old index.html -- cache not yet expired after push
-S512 Fix white screen on Delphi-IDE GitHub Pages site (delphi.test.shaunroselt.com) by adjusting code only -- completed and pushed (May 17, 8:37 PM)
+S513 User requested a numbered summary of all prompts given during the session (May 17, 8:37 PM)
 1499 8:49p ⚖️ Form Components: One Folder Per Component Structure
 1500 " 🔵 Delphi-IDE Project Structure Mapped
 1501 " 🔵 Component Rendering Uses Monolithic Switch Statements
 1502 " 🔄 Per-Component Folder Scaffold Created Under src/components/
 1503 8:50p 🔄 All 36 VCL Components Migrated to Per-Component index.js Modules
+S518 User asked if Claude could see the current project — confirmed working directory and project context (May 17, 8:58 PM)
+### May 18, 2026
+S519 Delphi-IDE: Add close button on Welcome Page tab and implement project-based saving in File menu (May 18, 12:26 PM)
+1582 12:29p 🔵 Delphi-IDE Project Structure Mapped
+1583 " 🔵 Welcome Tab Close Button Already Conditionally Suppressed in renderDocumentTabs
+1584 " 🔵 File Menu Actions Routed via data-menu-action Attribute in Menubar
+1585 12:30p 🔵 closeTab Action Re-Adds Welcome Tab Automatically — Needs Guard Removal for Close Button
+1586 12:31p 🔵 Right Dock Panel Title Hardcodes "Project1.dproj" — Not Yet State-Driven
+1587 " 🟣 Welcome Tab Now Has a Close Button
+1588 " 🟣 Title Bar Now Reads Project Name from state.project.name
+1589 " 🟣 Project Object Added to defaultState; Separate Projects Storage Key Defined
+1590 " 🟣 Project-Based Save Infrastructure Added to state.js
+1591 12:32p ✅ actions.js Imports saveProjectSnapshot and activeTab from state.js
+1592 " 🟣 Project-Based Save Actions Wired; closeTab Fixed; openWelcomeTab Added
+1593 " 🔴 Welcome Page Menu Action Now Uses openWelcomeTab Instead of Direct activeTabId Set
+1594 " 🟣 Right Dock Project Panel Title Now Driven by state.project.name
+1595 12:36p 🟣 Delphi-IDE: Close Button on Welcome Tab and Project-Based File Saving
+S520 Start local dev server for Delphi-IDE to test changes before committing (May 18, 12:37 PM)
+1596 12:43p 🔵 Delphi-IDE local dev server started via Vite
+1597 " 🔵 Delphi-IDE Vite dev server runs on localhost:5173
+S521 Implement IntelliSense (Code Insight) for the Delphi IDE code editor with completion popups, symbol resolution, diagnostic highlighting, and navigation features. (May 18, 12:43 PM)
+1598 1:14p 🟣 Caret positioning utilities for source-aware text editing
+1599 1:15p 🟣 IntelliSense infrastructure: diagnostic highlighting and symbol analysis
+1600 " ✅ Code page renderer: diagnostic-aware highlighting and procedure navigation
+1601 1:17p 🟣 Code editor IntelliSense: completion popup, definition lookup, procedure navigation
+1602 " ✅ IntelliSense UI styling and code cleanup
+1603 1:18p 🔵 Irregular whitespace (nbsp) in caret offset regex patterns
+1604 " 🔴 Fixed irregular whitespace linting errors in caret utilities
+1605 1:19p 🔵 Uncaught irregular whitespace in wire/code.js
+1606 1:20p 🔴 Fixed irregular whitespace in wire/code.js readSourceText()
+1608 1:32p 🔴 Code Editor Keyboard Operations Broken - Redo Requested
+1609 1:34p 🔵 Caret Helper Functions Architecture in Delphi-IDE Editor
+1610 " 🔴 Code Editor Rebuilt: contenteditable Div Replaced with Textarea + Pre Overlay
+1611 1:35p 🔴 wire/code.js Fully Rewritten for Textarea-Based Editor
+1612 1:36p 🔴 App.css Updated for Textarea + Pre Overlay Editor Layout
+1613 " 🔵 Old Contenteditable Caret Helpers Still Present in util.js After Rewrite
+1614 " 🔄 Dead Caret Helper Functions Removed from util.js
+1615 " ✅ Delphi-IDE Builds Clean After Editor Rewrite
+1616 1:37p ✅ Document-Level mousedown Popup Dismiss Handler Removed
+1617 " 🔄 Popup Dismiss Listener Moved to Module Scope to Prevent Listener Leaks
+S522 Delphi-IDE code editor full rewrite — fix broken tab indentation, Enter key, and normal editing operations (May 18, 1:37 PM)
+1623 2:20p 🔵 Delphi-IDE Project Structure Identified
+1624 " 🔵 Delphi-IDE Favicon and README Context Before Image Addition
+1625 " 🔵 User-Supplied Image Identified: ChatGPT-Generated PNG in Downloads
+1626 2:21p 🟣 Delphi-IDE Project Icon and Social Meta Tags Added
+1627 " 🟣 README Hero Image Added and OG/Twitter URLs Fixed to Absolute
+1628 2:22p ✅ Project Icon Renamed to Delphi_Helm_Icon.png
+1629 " 🔴 index.html References Updated to Match Renamed Icon File
+1630 " 🟣 Delphi_Helm_Icon.png Fully Wired as Project Identity Image
 
-Access 141k tokens of past work via get_observations([IDs]) or mem-search skill.
+Access 287k tokens of past work via get_observations([IDs]) or mem-search skill.
 </claude-mem-context>

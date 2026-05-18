@@ -1541,63 +1541,82 @@ button {
 }
 
 .code-editor {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  overflow: auto;
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  min-height: 0;
   background: #1e252e;
-  font: 14px/1.5 Consolas, "Liberation Mono", monospace;
   color: #d4d4d4;
-  caret-color: #ffffff;
-  outline: none;
-  white-space: pre;
+  font: 14px/1.5 Consolas, "Liberation Mono", monospace;
+  overflow: hidden;
 }
 
-.code-line {
-  display: flex;
-}
-
-.code-line:hover {
-  background: #232b35;
-}
-
-.code-line.has-error {
-  background: rgba(150, 42, 42, 0.22);
-}
-
-.code-line.has-warning {
-  background: rgba(170, 126, 31, 0.18);
-}
-
-.code-editor .ln {
-  display: inline-block;
-  width: 52px;
-  flex-shrink: 0;
-  padding-right: 12px;
+.code-gutter {
+  background: #1a232b;
   color: #5a6d7c;
   text-align: right;
-  background: #1a232b;
-  user-select: none;
   border-right: 1px solid #2a3540;
+  overflow: hidden;
+  user-select: none;
+  padding: 8px 0;
 }
 
-.code-line.has-error .ln {
-  color: #f48771;
+.code-line-num {
+  padding: 0 8px 0 4px;
+  white-space: nowrap;
 }
 
-.code-line.has-warning .ln {
-  color: #cca700;
-}
+.code-line-num.has-error { color: #f48771; }
+.code-line-num.has-warning { color: #cca700; }
 
-.code-editor .code-text {
-  padding-left: 8px;
-  flex: 1;
+.code-surface {
+  position: relative;
+  overflow: hidden;
   min-width: 0;
 }
 
-.code-editor ::selection {
-  background: #1f4a7a;
-  color: #ffffff;
+.code-highlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 8px 8px 8px 8px;
+  white-space: pre;
+  pointer-events: none;
+  color: #d4d4d4;
+  font: inherit;
+  line-height: inherit;
+  will-change: transform;
+}
+
+.code-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 8px 8px 8px 8px;
+  background: transparent;
+  color: transparent;
+  caret-color: #ffffff;
+  border: 0;
+  outline: none;
+  resize: none;
+  font: inherit;
+  line-height: inherit;
+  white-space: pre;
+  overflow: auto;
+  tab-size: 2;
+  -moz-tab-size: 2;
+}
+
+.code-input::selection {
+  background: rgba(31, 74, 122, 0.55);
+  color: transparent;
+}
+
+.code-input::-moz-selection {
+  background: rgba(31, 74, 122, 0.55);
+  color: transparent;
 }
 
 .tok-k { color: #569cd6; font-weight: 600; }
@@ -1605,6 +1624,94 @@ button {
 .tok-s { color: #ce9178; }
 .tok-c { color: #6a9955; font-style: italic; }
 .tok-n { color: #b5cea8; }
+.tok-id { color: inherit; }
+
+.tok-err {
+  text-decoration: underline wavy #f48771;
+  text-underline-offset: 2px;
+}
+
+.tok-warn {
+  text-decoration: underline wavy #cca700;
+  text-underline-offset: 2px;
+}
+
+.code-insight-popup {
+  position: fixed;
+  min-width: 240px;
+  max-width: 320px;
+  max-height: 220px;
+  overflow: auto;
+  background: #252b35;
+  border: 1px solid #3a4a58;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 80;
+  font: 12px Consolas, "Liberation Mono", monospace;
+  color: #d4d4d4;
+  padding: 2px;
+}
+
+.code-insight-popup[hidden] {
+  display: none;
+}
+
+.code-insight-empty {
+  padding: 8px 10px;
+  color: #7f93a0;
+  font-style: italic;
+}
+
+.code-insight-item {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  padding: 4px 8px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.code-insight-item:hover { background: #2a3540; }
+.code-insight-item.active { background: #094771; color: #ffffff; }
+
+.code-insight-item .ci-kind {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #1e252e;
+}
+
+.ci-kind.ci-keyword { background: #569cd6; }
+.ci-kind.ci-type { background: #4ec9b0; }
+.ci-kind.ci-component { background: #c586c0; }
+.ci-kind.ci-property { background: #dcdcaa; }
+.ci-kind.ci-event { background: #ce9178; }
+.ci-kind.ci-method { background: #9cdcfe; }
+.ci-kind.ci-procedure { background: #b5cea8; }
+.ci-kind.ci-function { background: #b5cea8; }
+
+.code-insight-item .ci-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.code-insight-item .ci-detail {
+  color: #7f93a0;
+  font-size: 11px;
+}
+
+.code-insight-item.active .ci-detail { color: #d4d4d4; }
 
 .compiler-messages {
   min-height: 0;

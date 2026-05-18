@@ -1,8 +1,10 @@
 const STORAGE_KEY = 'delphi-ide-state-v2'
+const PROJECTS_KEY = 'delphi-ide-projects-v1'
 
 export function defaultState() {
   return {
     activeTabId: 'welcome',
+    project: { name: 'Project1' },
     openTabs: [
       { id: 'welcome', kind: 'welcome', title: 'Welcome Page', formId: null },
       { id: 'form-1', kind: 'form', title: 'Unit1', formId: 'form1' },
@@ -72,6 +74,7 @@ function loadState() {
     parsed.quickEditOpen = false
     parsed.contextMenu = null
     parsed.layoutSizes ||= defaultState().layoutSizes
+    parsed.project ||= { name: 'Project1' }
     return parsed
   } catch {
     return null
@@ -86,6 +89,36 @@ export function persistState() {
   } catch {
     /* ignore */
   }
+}
+
+export function loadProjects() {
+  try {
+    const raw = localStorage.getItem(PROJECTS_KEY)
+    return raw ? JSON.parse(raw) : {}
+  } catch {
+    return {}
+  }
+}
+
+export function saveProjectSnapshot(name) {
+  try {
+    const all = loadProjects()
+    all[name] = {
+      name,
+      forms: JSON.parse(JSON.stringify(state.forms)),
+      openTabs: state.openTabs.filter((t) => t.kind !== 'welcome'),
+      activeTabId: state.activeTabId,
+      savedAt: new Date().toISOString(),
+    }
+    localStorage.setItem(PROJECTS_KEY, JSON.stringify(all))
+    return true
+  } catch {
+    return false
+  }
+}
+
+export function listProjects() {
+  return Object.keys(loadProjects())
 }
 
 export function activeTab() {

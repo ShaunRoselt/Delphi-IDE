@@ -37,12 +37,13 @@ function renderLeftDock() {
 }
 
 function renderRightDock() {
-  const projectBody = `<div class="project-tools">⚙ &nbsp; Project1 &nbsp; ⌕</div>${renderProjectTree()}`
+  const projectName = state.project?.name || 'Project1'
+  const projectBody = `<div class="project-tools">⚙ &nbsp; ${escapeHtml(projectName)} &nbsp; ⌕</div>${renderProjectTree()}`
   const paletteBody = `<div class="palette-filter"><button type="button" title="Toggle view">◰</button><input data-action="palette-filter" value="${escapeHtml(state.paletteFilter)}" placeholder="Search palette..." /></div>${renderPalette()}`
   const top = state.layoutSizes?.rightTop ?? 486
   return `
     <aside class="right-dock" style="grid-template-rows:minmax(180px, ${top}px) 5px minmax(180px, 1fr)">
-      ${panel('Project1.dproj - Projects', projectBody, 'project-panel')}
+      ${panel(`${escapeHtml(projectName)}.dproj - Projects`, projectBody, 'project-panel')}
       <div class="dock-splitter horizontal" data-layout-resize="right-stack" title="Resize panels"></div>
       ${panel('Palette', paletteBody, 'palette-panel')}
     </aside>
