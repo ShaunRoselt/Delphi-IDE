@@ -1,4 +1,4 @@
-import { wireGlobal, wireMenus, wireTabs, wireWelcome } from './chrome.js'
+import { wireGlobal, wireMenus, wireTabs, wireWelcome, wireSearch } from './chrome.js'
 import { wirePalette } from './palette.js'
 import { wireStructure, wireInspector } from './inspector.js'
 import { wireDesigner } from './designer.js'
@@ -20,5 +20,6 @@ export function wireAll() {
   wireLayoutResize()
   wireCodeEditor()
   wireWelcome()
+  wireSearch()
   wireRuntime()
 }

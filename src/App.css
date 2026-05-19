@@ -55,6 +55,64 @@ button {
   background: #1b75ad;
 }
 
+.ide-search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.ide-search-container input {
+  width: 100%;
+}
+
+.ide-search-popup {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: #252e38;
+  border: 1px solid #3c4c58;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  z-index: 400;
+  margin-top: 4px;
+}
+
+.search-result-item {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #344050;
+}
+
+.search-result-item:hover,
+.search-result-item.selected {
+  background: #2978c0;
+}
+
+.search-cat {
+  font-size: 10px;
+  color: #8ab0c4;
+  margin-bottom: 2px;
+}
+
+.search-result-item:hover .search-cat,
+.search-result-item.selected .search-cat {
+  color: #cfe1f3;
+}
+
+.search-lbl {
+  font-size: 12px;
+  color: #d8e4eb;
+}
+
+.search-result-item:hover .search-lbl,
+.search-result-item.selected .search-lbl {
+  color: #ffffff;
+}
+
 .app-actions {
   display: flex;
   justify-content: flex-end;
@@ -213,6 +271,43 @@ button {
   margin: 3px 8px;
   background: #344050;
 }
+
+/* ── Nested submenu (New ▶) ─────────────────────────────────── */
+.menu-sub-item {
+  position: relative;
+}
+
+.menu-sub-item > button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  border: 0;
+  padding: 3px 14px 3px 2px;
+  color: #d8e4eb;
+  background: transparent;
+  font-size: 12px;
+  text-align: left;
+}
+
+.menu-sub-item.sub-open > button,
+.menu-sub-item > button:hover {
+  background: #2978c0;
+  color: #ffffff;
+}
+
+.menu-sub-popup {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  min-width: 268px;
+  padding: 4px 0;
+  background: #252e38;
+  border: 1px solid #3c4c58;
+  box-shadow: 4px 4px 14px rgba(0, 0, 0, 0.6);
+  z-index: 300;
+}
+
+
 
 .toolbar {
   display: flex;

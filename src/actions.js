@@ -2,7 +2,7 @@ import {
   state, activeForm, activeTab, isFormSelected, persistState, snap,
   saveProjectSnapshot,
 } from './state.js'
-import { COMPONENT_DEFS, COMMON_PROPS, DEFAULT_EVENT } from './data.js'
+import { COMPONENT_DEFS, COMMON_PROPS, DEFAULT_EVENT, MENU_DEFS, NEW_SUBMENU } from './data.js'
 import { renderApp } from './main.js'
 import { startProgram, stopProgram } from './runtime.js'
 import { generatePascal } from './pascal.js'
@@ -260,10 +260,37 @@ export function compileActiveForm() {
 }
 
 export function executeMenu(label) {
+  if (label === 'IDE Insight') {
+    state.menuOpen = null
+    state.subMenuOpen = null
+    setTimeout(() => {
+      document.getElementById('ide-search-input')?.focus()
+    }, 10)
+    return true
+  }
+
   state.menuOpen = null
+  state.subMenuOpen = null
   const clean = label.split('|')[0].trim().replace(/\.\.\.$/, '').replace(/ ▶$/, '')
   switch (clean) {
     case 'New': newForm(); break
+    // New ▶ sub-menu entries
+    case 'Windows VCL Application - Delphi':
+    case 'VCL Form - Delphi':
+    case 'VCL Frame - Delphi':
+      newForm(); break
+    case 'Multi-Device Application - Delphi':
+    case 'Multi-Device Form - Delphi':
+    case 'FireMonkey Frame - Delphi':
+      newForm(); state.statusMessage = `${clean} (stub)`; break
+    case 'Package - Delphi':
+    case 'Console Application - Delphi':
+    case 'Dynamic Library - Delphi':
+    case 'Data Module - Delphi':
+    case 'Unit - Delphi':
+    case 'Other':
+    case 'Customize':
+      state.statusMessage = `${clean} (stub)`; break
     case 'Open Project':
     case 'Open File': state.statusMessage = 'Open dialog (stub)'; break
     case 'Save':
@@ -358,3 +385,68 @@ export function applyProp(selected, isForm, name, raw) {
   }
   selected.props[name] = value
 }
+
+export function updateSearchQuery(query) {
+  state.searchQuery = query
+  state.searchSelectedIndex = 0
+  if (!query.trim()) {
+    state.searchResults = []
+    state.searchOpen = false
+    return
+  }
+
+  const q = query.toLowerCase()
+  const results = []
+
+  // Search Menus
+  for (const [menuName, items] of Object.entries(MENU_DEFS)) {
+    for (const item of items) {
+      if (item === '-') continue
+      const cleanLabel = item.split('|')[0].trim().replace(/ ▶$/, '')
+      if (cleanLabel.toLowerCase().includes(q)) {
+        results.push({ category: `Menu > ${menuName}`, label: cleanLabel, type: 'menu' })
+      }
+    }
+  }
+
+  // Search New Submenu
+  for (const item of NEW_SUBMENU) {
+    if (item === '-') continue
+    if (item.toLowerCase().includes(q)) {
+      results.push({ category: 'Menu > File > New', label: item, type: 'menu' })
+    }
+  }
+
+  // Search Components
+  for (const compType of Object.keys(COMPONENT_DEFS)) {
+    if (compType.toLowerCase().includes(q)) {
+      results.push({ category: 'Component', label: compType, type: 'component' })
+    }
+  }
+
+  // Note: Searching properties can be added here later
+
+  state.searchResults = results.slice(0, 15) // Limit to 15 results
+  state.searchOpen = state.searchResults.length > 0
+}
+
+export function executeSearchAction(index) {
+  const item = state.searchResults[index]
+  if (!item) return
+  
+  state.searchOpen = false
+  state.searchQuery = ''
+  
+  if (item.type === 'menu') {
+    executeMenu(item.label)
+  } else if (item.type === 'component') {
+    const f = activeForm()
+    if (f) {
+      addComponent(f, item.label)
+      state.statusMessage = `Added ${item.label} to form`
+    } else {
+      state.statusMessage = 'Open a form to add components'
+    }
+  }
+}
+

@@ -1,5 +1,23 @@
 export { COMPONENT_DEFS, COMMON_PROPS, DEFAULT_EVENT } from './components/index.js'
 
+export const NEW_SUBMENU = [
+  'Windows VCL Application - Delphi',
+  'Multi-Device Application - Delphi',
+  'Package - Delphi',
+  'Console Application - Delphi',
+  'Dynamic Library - Delphi',
+  '-',
+  'VCL Form - Delphi',
+  'VCL Frame - Delphi',
+  'Data Module - Delphi',
+  'FireMonkey Frame - Delphi',
+  'Multi-Device Form - Delphi',
+  'Unit - Delphi',
+  '-',
+  'Other...',
+  'Customize...',
+]
+
 export const PALETTE_CATEGORIES = [
   'Standard', 'Additional', 'Win32', 'System', 'Dialogs',
   'Data Access', 'Data Controls', 'dbExpress', 'LiveBindings',

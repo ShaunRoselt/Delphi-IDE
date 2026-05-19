@@ -1,5 +1,5 @@
 import { state, activeForm } from '../state.js'
-import { MENU_DEFS, MENU_DISABLED_NO_PROJECT, PLATFORMS, CONFIGURATIONS, LAYOUTS } from '../data.js'
+import { MENU_DEFS, MENU_DISABLED_NO_PROJECT, PLATFORMS, CONFIGURATIONS, LAYOUTS, NEW_SUBMENU } from '../data.js'
 import { escapeHtml, iconButton } from '../util.js'
 
 export function renderTitleBar() {
@@ -12,7 +12,19 @@ export function renderTitleBar() {
     <header class="titlebar">
       <div class="app-badge">RAD</div>
       <div class="window-title">${escapeHtml(title)}</div>
-      <input aria-label="IDE search" placeholder="Search the IDE..." />
+      <div class="ide-search-container">
+        <input id="ide-search-input" type="text" aria-label="IDE search" placeholder="Search the IDE..." value="${escapeHtml(state.searchQuery)}" autocomplete="off" />
+        ${state.searchOpen && state.searchResults.length > 0 ? `
+          <div class="ide-search-popup">
+            ${state.searchResults.map((res, i) => `
+              <div class="search-result-item ${i === state.searchSelectedIndex ? 'selected' : ''}" data-search-index="${i}">
+                <span class="search-cat">${escapeHtml(res.category)}</span>
+                <span class="search-lbl">${escapeHtml(res.label)}</span>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+      </div>
       <select aria-label="Layout" data-config-target="layout">
         ${LAYOUTS.map((l) => `<option ${l === state.layout ? 'selected' : ''}>${l}</option>`).join('')}
       </select>
@@ -139,6 +151,31 @@ const MENU_ICONS = {
   'About Embarcadero® Delphi': ic('ℹ', '#1a5080', '#90d0ff'),
 }
 
+// Icons for the New ▶ submenu items
+const NEW_SUBMENU_ICONS = {
+  'Windows VCL Application - Delphi': ic('▣', '#1e5fa0'),
+  'Multi-Device Application - Delphi': ic('⊞', '#1a6e78'),
+  'Package - Delphi': ic('⬡', '#5a3a80'),
+  'Console Application - Delphi': ic('⌨', '#2a4e30'),
+  'Dynamic Library - Delphi': ic('⚙', '#5a4a1a'),
+  'VCL Form - Delphi': ic('◻', '#1e5fa0'),
+  'VCL Frame - Delphi': ic('▣', '#1e5fa0'),
+  'Data Module - Delphi': ic('⊟', '#2a4e6a'),
+  'FireMonkey Frame - Delphi': ic('◈', '#8c2060'),
+  'Multi-Device Form - Delphi': ic('⊞', '#1a6e78'),
+  'Unit - Delphi': ic('◻', '#2a5e6a'),
+  'Other...': ic('…', '#4a5a6a'),
+  'Customize...': ic('⚙', '#3a5060'),
+}
+
+function renderNewSubMenu() {
+  return `<div class="menu-popup menu-sub-popup">${NEW_SUBMENU.map((entry) => {
+    if (entry === '-') return '<div class="menu-sep"></div>'
+    const iconHtml = NEW_SUBMENU_ICONS[entry] || ''
+    return `<button type="button" data-submenu-action="${escapeHtml(entry)}"><span class="menu-icon">${iconHtml}</span><span class="menu-lbl">${escapeHtml(entry)}</span></button>`
+  }).join('')}</div>`
+}
+
 export function renderMenubar() {
   const hasProject = state.openTabs.some((t) => t.kind === 'form')
   const items = Object.keys(MENU_DEFS).map((name) => {
@@ -154,10 +191,18 @@ export function renderMenubar() {
             return `<div class="menu-info">${escapeHtml(cleanLbl)}</div>`
           }
           const dis = disabledSet?.has(cleanLbl) ? ' disabled' : ''
+          const iconHtml = MENU_ICONS[cleanLbl] || ''
+
+          // Special case: "New" triggers a nested submenu
+          if (isSub && cleanLbl === 'New') {
+            const subOpen = state.subMenuOpen === 'New'
+            const subHtml = subOpen ? renderNewSubMenu() : ''
+            return `<div class="menu-sub-item${subOpen ? ' sub-open' : ''}" data-submenu-trigger="New"><button type="button" data-submenu="New"${dis}><span class="menu-icon">${iconHtml}</span><span class="menu-lbl">${escapeHtml(cleanLbl)}</span><span class="menu-arrow">&#9658;</span></button>${subHtml}</div>`
+          }
+
           const right = isSub
             ? '<span class="menu-arrow">&#9658;</span>'
             : (sc ? `<kbd>${escapeHtml(sc)}</kbd>` : '')
-          const iconHtml = MENU_ICONS[cleanLbl] || ''
           return `<button type="button" data-menu-action="${escapeHtml(cleanLbl)}"${dis}><span class="menu-icon">${iconHtml}</span><span class="menu-lbl">${escapeHtml(cleanLbl)}</span>${right}</button>`
         }).join('')}</div>`
       : ''

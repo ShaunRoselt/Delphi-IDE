@@ -1,6 +1,7 @@
 import { state } from '../state.js'
 import {
   executeMenu, newForm, closeTab, selectTab, runProgram,
+  updateSearchQuery, executeSearchAction
 } from '../actions.js'
 import { stopProgram } from '../runtime.js'
 import { renderApp } from '../main.js'
@@ -61,6 +62,28 @@ export function wireMenus() {
       if (shouldRender !== false) renderApp()
     })
   })
+  // Nested submenu trigger (e.g. "New ▶")
+  document.querySelectorAll('[data-submenu]').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation()
+      state.subMenuOpen = state.subMenuOpen === btn.dataset.submenu ? null : btn.dataset.submenu
+      renderApp()
+    })
+    btn.addEventListener('mouseenter', () => {
+      if (state.subMenuOpen !== btn.dataset.submenu) {
+        state.subMenuOpen = btn.dataset.submenu
+        renderApp()
+      }
+    })
+  })
+  // Actions inside the nested submenu flyout
+  document.querySelectorAll('[data-submenu-action]').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation()
+      const shouldRender = executeMenu(btn.dataset.submenuAction)
+      if (shouldRender !== false) renderApp()
+    })
+  })
 }
 
 export function wireTabs() {
@@ -92,11 +115,68 @@ export function wireWelcome() {
   })
 }
 
+export function wireSearch() {
+  const searchInput = document.getElementById('ide-search-input')
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      updateSearchQuery(e.target.value)
+      renderApp()
+      // Restore focus after re-render
+      setTimeout(() => {
+        const input = document.getElementById('ide-search-input')
+        if (input) {
+          input.focus()
+          input.selectionStart = input.value.length
+        }
+      }, 0)
+    })
+
+    searchInput.addEventListener('keydown', (e) => {
+      if (!state.searchOpen || state.searchResults.length === 0) return
+      
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        state.searchSelectedIndex = (state.searchSelectedIndex + 1) % state.searchResults.length
+        renderApp()
+        setTimeout(() => document.getElementById('ide-search-input')?.focus(), 0)
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        state.searchSelectedIndex = (state.searchSelectedIndex - 1 + state.searchResults.length) % state.searchResults.length
+        renderApp()
+        setTimeout(() => document.getElementById('ide-search-input')?.focus(), 0)
+      } else if (e.key === 'Enter') {
+        e.preventDefault()
+        executeSearchAction(state.searchSelectedIndex)
+        renderApp()
+      } else if (e.key === 'Escape') {
+        e.preventDefault()
+        state.searchOpen = false
+        renderApp()
+      }
+    })
+  }
+
+  document.querySelectorAll('.search-result-item').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation()
+      executeSearchAction(Number(el.dataset.searchIndex))
+      renderApp()
+    })
+  })
+}
+
 // Document-level handler that closes any open menu when the user clicks away.
 // Registered once at module load — wireMenus() can be called many times safely.
 document.addEventListener('click', (e) => {
+  let changed = false
   if (state.menuOpen && !e.target.closest('.menubar') && !e.target.closest('.menu-popup')) {
     state.menuOpen = null
-    renderApp()
+    state.subMenuOpen = null
+    changed = true
   }
+  if (state.searchOpen && !e.target.closest('.ide-search-container')) {
+    state.searchOpen = false
+    changed = true
+  }
+  if (changed) renderApp()
 })

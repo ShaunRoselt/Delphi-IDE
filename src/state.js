@@ -38,6 +38,11 @@ export function defaultState() {
     paletteFilter: '',
     paletteOpen: { Standard: true, Additional: false, Win32: false, System: false, Dialogs: false },
     menuOpen: null,
+    subMenuOpen: null,
+    searchOpen: false,
+    searchQuery: '',
+    searchResults: [],
+    searchSelectedIndex: 0,
     statusMessage: 'CodeInsight: Done',
     modified: false,
     platform: 'Windows 64-bit',
@@ -68,6 +73,11 @@ function loadState() {
     if (!raw) return null
     const parsed = JSON.parse(raw)
     parsed.menuOpen = null
+    parsed.subMenuOpen = null
+    parsed.searchOpen = false
+    parsed.searchQuery = ''
+    parsed.searchResults = []
+    parsed.searchSelectedIndex = 0
     parsed.runDialog = null
     parsed.running = null
     parsed.diagnostics = []
