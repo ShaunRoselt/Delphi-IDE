@@ -1,7 +1,8 @@
 import { state, activeForm } from '../state.js'
 import {
-  generatePascal, highlightPascal, findProcedureLines, findNavigationSections, findTypeLines,
+  generatePascal, findProcedureLines, findNavigationSections, findTypeLines,
 } from '../pascal.js'
+import { highlightPascalFull } from '../lang/highlighter.js'
 import { escapeHtml } from '../util.js'
 import { renderViewSwitcher } from './chrome.js'
 
@@ -88,11 +89,7 @@ function diagnosticsByLine(diagnostics) {
 }
 
 export function renderHighlight(src, diagnostics) {
-  const byLine = diagnosticsByLine(diagnostics)
-  return src.split('\n').map((line, i) => {
-    const entry = byLine.get(i + 1)
-    return highlightPascal(line, entry?.items || []) || ' '
-  }).join('\n')
+  return highlightPascalFull(src || ' ', diagnostics)
 }
 
 export function renderGutter(src, diagnostics) {

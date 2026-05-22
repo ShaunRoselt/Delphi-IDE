@@ -1283,25 +1283,6 @@ button {
   color: #d4d4d4;
 }
 
-.code-page pre {
-  margin: 0;
-  overflow: auto;
-  padding: 10px 0;
-  font: 18px/1.55 Consolas, "Liberation Mono", monospace;
-}
-
-.code-page .ln {
-  display: inline-block;
-  width: 52px;
-  padding-right: 14px;
-  color: #9aa7cf;
-  text-align: right;
-}
-
-.code-page code {
-  color: #001fb4;
-  font-weight: 700;
-}
 
 .statusbar {
   display: flex;
@@ -1701,25 +1682,22 @@ button {
 
 .code-editor {
   display: grid;
-  grid-template-columns: 52px minmax(0, 1fr);
+  grid-template-columns: 56px minmax(0, 1fr);
   min-height: 0;
-  background: transparent;
-  color: transparent;
-  z-index: 2;
-  font-family: Consolas, "Liberation Mono", monospace;
+  overflow: hidden;
+  font-family: "Cascadia Code", "Fira Code", Consolas, "Liberation Mono", monospace;
   font-size: 14px;
   font-weight: 400;
   font-style: normal;
-  line-height: 21px;
+  line-height: 22px;
   letter-spacing: 0;
-  overflow: hidden;
 }
 
 .code-gutter {
-  background: #1a232b;
-  color: #5a6d7c;
+  background: #161d24;
+  color: #3d5262;
   text-align: right;
-  border-right: 1px solid #2a3540;
+  border-right: 2px solid #1f2e3a;
   overflow: hidden;
   user-select: none;
   padding: 8px 0;
@@ -1728,21 +1706,67 @@ button {
 .code-line-num {
   padding: 0 8px 0 4px;
   white-space: nowrap;
+  font-size: 12px;
+  transition: color 0.1s;
 }
 
-.code-line-num.has-error { color: #f48771; }
+.code-line-num.has-error  { color: #f14c4c; }
 .code-line-num.has-warning { color: #cca700; }
 
 .code-surface {
+  position: relative;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
-  background: #1e252e;
+  background: #1a2230;
 }
 
-.code-highlight,
+/* Highlight pre — sits behind the textarea */
+.code-highlight {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  margin: 0;
+  padding: 8px;
+  pointer-events: none;
+  white-space: pre;
+  word-wrap: normal;
+  overflow: visible;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  color: #d4d4d4;
+  min-width: 100%;
+  min-height: 100%;
+}
+
+/* Search overlay — sits above highlight, below textarea */
 .code-search-layer {
-  display: none;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  margin: 0;
+  padding: 8px;
+  pointer-events: none;
+  white-space: pre;
+  word-wrap: normal;
+  overflow: visible;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  color: transparent;
+  min-width: 100%;
+  min-height: 100%;
 }
 
 .code-search-mark {
@@ -1756,8 +1780,11 @@ button {
   outline: 1px solid rgba(117, 174, 221, 0.75);
 }
 
+/* Transparent textarea sits on top — cursor and selection visible */
 .code-input {
   display: block;
+  position: relative;
+  z-index: 3;
   width: 100%;
   height: 100%;
   margin: 0;
@@ -1766,13 +1793,12 @@ button {
   outline: none;
   resize: none;
   box-sizing: border-box;
-  background: #1e252e;
-  color: #d4d4d4;
-  caret-color: #ffffff;
+  background: transparent;
+  color: transparent;
+  caret-color: #e8e8e8;
   font-family: inherit;
   font-size: inherit;
-  font-weight: 400;
-  font-style: normal;
+  font-weight: inherit;
   line-height: inherit;
   letter-spacing: inherit;
   white-space: pre;
@@ -1782,30 +1808,35 @@ button {
 }
 
 .code-input::selection {
-  background: rgba(42, 112, 170, 0.65);
-  color: #ffffff;
+  background: rgba(38, 109, 180, 0.55);
+  color: transparent;
 }
 
 .code-input::-moz-selection {
-  background: rgba(42, 112, 170, 0.65);
-  color: #ffffff;
+  background: rgba(38, 109, 180, 0.55);
+  color: transparent;
 }
 
-.tok-k { color: #569cd6; font-weight: inherit; }
-.tok-t { color: #4ec9b0; }
-.tok-s { color: #ce9178; }
-.tok-c { color: #6a9955; font-style: inherit; }
-.tok-n { color: #b5cea8; }
-.tok-id { color: inherit; }
+/* ── Token classes (VS Code dark+ inspired, Object Pascal edition) ─── */
+.tok-k  { color: #569cd6; }                          /* keyword   — blue         */
+.tok-t  { color: #4ec9b0; }                          /* type name — teal         */
+.tok-b  { color: #dcdcaa; }                          /* builtin   — yellow       */
+.tok-s  { color: #ce9178; }                          /* string    — warm orange  */
+.tok-c  { color: #6a9955; font-style: italic; }      /* comment   — green italic */
+.tok-n  { color: #b5cea8; }                          /* number    — sage green   */
+.tok-dir { color: #808080; }                          /* directive — grey         */
+.tok-op  { color: #d4d4d4; }                          /* operator  — light        */
+.tok-sym { color: #7a8fa0; }                          /* delimiter — muted        */
+.tok-id  { color: #d4d4d4; }                          /* identifier — default     */
 
 .tok-err {
-  text-decoration: underline wavy #f48771;
-  text-underline-offset: 2px;
+  text-decoration: underline wavy #f14c4c;
+  text-underline-offset: 3px;
 }
 
 .tok-warn {
   text-decoration: underline wavy #cca700;
-  text-underline-offset: 2px;
+  text-underline-offset: 3px;
 }
 
 .code-findbar {
