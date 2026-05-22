@@ -2255,16 +2255,29 @@ button {
   display: none;
 }
 
-/* ─── Floating Runtime Window ──────────────────────────────────────────── */
+/* ─── Runtime backdrop + Floating Form Window ──────────────────────────── */
+
+/* Dim the IDE behind the running form — pointer-events none so you can
+   drag the window to reveal any part of the IDE underneath */
+.runtime-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 599;
+  background: rgba(0, 0, 0, 0.38);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  pointer-events: none;
+}
+
 .runtime-floatwin {
   position: fixed;
   z-index: 600;
   display: grid;
-  grid-template-rows: 31px minmax(0, 1fr);
+  grid-template-rows: 30px minmax(0, 1fr);
   background: #f0f0f0;
-  border: 1px solid #7a9ab0;
-  border-radius: 4px 4px 0 0;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.3);
+  border: 1px solid #0078d4;
+  border-top: 2px solid #0078d4;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.08);
   overflow: visible;
   min-width: 140px;
   min-height: 62px;
@@ -2272,52 +2285,67 @@ button {
 }
 
 .runtime-floatwin.minimized {
-  grid-template-rows: 31px 0;
-  height: 31px !important;
+  grid-template-rows: 30px 0;
   overflow: hidden;
+  border-bottom: 1px solid #0078d4;
 }
 
+/* Windows 10/11 style title bar — light grey with blue accent on active */
 .runtime-floatwin-caption {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 0 9px;
-  background: linear-gradient(#bfd4e8, #a8c3db 55%, #94b3cc);
-  border-bottom: 1px solid #7a9ab0;
-  border-radius: 3px 3px 0 0;
-  color: #2a3540;
+  gap: 7px;
+  padding: 0 0 0 10px;
+  background: #f3f3f3;
+  border-bottom: 1px solid #d0d0d0;
+  color: #1a1a1a;
   font: 12px "Segoe UI", Tahoma, sans-serif;
   cursor: move;
 }
 
-.runtime-floatwin-caption .runtime-title {
+.rt-form-icon {
+  flex-shrink: 0;
+  color: #c61a30;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.runtime-title {
   flex: 1;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 400;
+  color: #1a1a1a;
 }
 
-.runtime-floatwin-caption .form-buttons button {
-  width: 30px;
-  height: 18px;
-  border: 1px solid #7a9ab0;
-  border-radius: 2px;
-  color: #2a3540;
-  background: linear-gradient(#d4e8f8, #b8d4ec);
-  font-size: 12px;
+.rt-caption-btns {
+  display: flex;
+  align-self: stretch;
+  margin-left: auto;
+}
+
+.rt-caption-btns button {
+  width: 46px;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  color: #1a1a1a;
+  font-size: 14px;
   line-height: 1;
   cursor: pointer;
+  display: grid;
+  place-items: center;
 }
 
-.runtime-floatwin-caption .form-buttons button:hover {
-  background: linear-gradient(#e4f0fa, #cce0f4);
+.rt-caption-btns button:hover {
+  background: rgba(0, 0, 0, 0.08);
 }
 
-.runtime-floatwin-caption .form-buttons button[data-floatwin-action="stop"]:hover {
-  background: #d33d3d;
+.rt-caption-btns .rt-close-btn:hover {
+  background: #c42b1c;
   color: #ffffff;
-  border-color: #b02828;
 }
 
 .runtime-client {
@@ -2326,7 +2354,7 @@ button {
   font: 12px "Segoe UI", Tahoma, sans-serif;
 }
 
-/* Resize handles */
+/* ── Resize handles ────────────────────────────────────────────────────── */
 .fw-resize {
   position: absolute;
   z-index: 10;
