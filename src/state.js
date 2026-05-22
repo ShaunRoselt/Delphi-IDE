@@ -64,6 +64,7 @@ export function defaultState() {
     quickEditOpen: false,
     contextMenu: null,
     cursorPos: { line: 1, col: 1 },
+    codeSearch: { open: false, query: '', activeIndex: 0, matches: [] },
   }
 }
 
@@ -83,6 +84,7 @@ function loadState() {
     parsed.diagnostics = []
     parsed.quickEditOpen = false
     parsed.contextMenu = null
+    parsed.codeSearch ||= { open: false, query: '', activeIndex: 0, matches: [] }
     parsed.layoutSizes ||= defaultState().layoutSizes
     parsed.project ||= { name: 'Project1' }
     return parsed

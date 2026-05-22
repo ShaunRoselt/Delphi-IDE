@@ -154,6 +154,22 @@ const KNOWN_PROCS = [
   'UpperCase', 'LowerCase', 'Trim', 'Copy', 'Pos',
 ]
 
+const ROUTINE_SIGNATURES = {
+  ShowMessage: 'procedure ShowMessage(const Msg: string)',
+  MessageDlg: 'function MessageDlg(const Msg: string; DlgType: TMsgDlgType; Buttons: TMsgDlgButtons; HelpCtx: Longint): Integer',
+  IntToStr: 'function IntToStr(Value: Integer): string',
+  StrToInt: 'function StrToInt(const S: string): Integer',
+  StrToIntDef: 'function StrToIntDef(const S: string; Default: Integer): Integer',
+  FloatToStr: 'function FloatToStr(Value: Extended): string',
+  Length: 'function Length(S): Integer',
+  Copy: 'function Copy(S; Index, Count: Integer): string',
+  Pos: 'function Pos(Substr, S: string): Integer',
+  Inc: 'procedure Inc(var X; N: Integer)',
+  Dec: 'procedure Dec(var X; N: Integer)',
+  Assigned: 'function Assigned(P): Boolean',
+  FreeAndNil: 'procedure FreeAndNil(var Obj)',
+}
+
 const FORM_MEMBERS = [
   ['Caption', 'property', 'String'],
   ['Color', 'property', 'TColor'],
@@ -264,6 +280,109 @@ export function findDeclarationLine(source, identifier) {
   return -1
 }
 
+
+export function getRoutineSignature(name) {
+  if (!name) return null
+  const found = Object.keys(ROUTINE_SIGNATURES).find((key) => key.toLowerCase() === name.toLowerCase())
+  return found ? ROUTINE_SIGNATURES[found] : null
+}
+
+export function findNavigationSections(source) {
+  const lines = source.split('\n')
+  const sections = [{ label: 'Top of File', line: 1 }]
+  const sectionWords = [
+    ['interface', 'Interface Section'],
+    ['uses', 'Interface Uses Clause'],
+    ['implementation', 'Implementation Section'],
+    ['initialization', 'Initialization Section'],
+  ]
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i].trim().toLowerCase()
+    const found = sectionWords.find(([word]) => trimmed === word || trimmed.startsWith(`${word} `))
+    if (found && !sections.some((s) => s.label === found[1])) sections.push({ label: found[1], line: i + 1 })
+  }
+  sections.push({ label: 'Bottom of File', line: Math.max(1, lines.length) })
+  return sections
+}
+
+export function findTypeLines(source) {
+  const lines = source.split('\n')
+  const result = []
+  for (let i = 0; i < lines.length; i++) {
+    const m = lines[i].match(/^\s*([A-Za-z_]\w*)\s*=\s*class\b/i)
+    if (m) result.push({ name: m[1], line: i + 1 })
+  }
+  return result
+}
+
+function escapeRe(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+export function renameIdentifierInCode(source, oldName, newName) {
+  if (!source || !oldName || !newName || oldName === newName) return source
+  return source.replace(new RegExp(`\\b${escapeRe(oldName)}\\b`, 'g'), () => newName)
+}
+
+function componentFieldLines(form) {
+  return [
+    ...form.components.map((c) => `    ${c.id}: ${c.type};`),
+    ...collectHandlers(form).map((h) => `    procedure ${h}(Sender: TObject);`),
+  ]
+}
+
+function replaceClassDeclaration(source, form) {
+  const classRe = new RegExp(`(^\\s*)${escapeRe(form.className)}\\s*=\\s*class\\(TForm\\)[\\s\\S]*?^\\s*end;`, 'mi')
+  const block = [
+    `  ${form.className} = class(TForm)`,
+    ...componentFieldLines(form),
+    '  private',
+    '    { Private declarations }',
+    '  public',
+    '    { Public declarations }',
+    '  end;',
+  ].join('\n')
+  if (classRe.test(source)) return source.replace(classRe, block)
+
+  const typeRe = /^type\s*$/mi
+  if (typeRe.test(source)) return source.replace(typeRe, `type\n${block}`)
+  return source.replace(/\binterface\b/i, `interface\n\ntype\n${block}`)
+}
+
+function ensureHandlerImplementations(source, form) {
+  let out = source
+  for (const handler of collectHandlers(form)) {
+    const procRe = new RegExp(`procedure\\s+${escapeRe(form.className)}\\s*\\.\\s*${escapeRe(handler)}\\s*\\(`, 'i')
+    if (procRe.test(out)) continue
+    const stub = `\nprocedure ${form.className}.${handler}(Sender: TObject);\nbegin\n  { TODO: ${handler} body }\nend;\n`
+    out = /\nend\.\s*$/i.test(out)
+      ? out.replace(/\nend\.\s*$/i, `${stub}\nend.\n`)
+      : `${out.trimEnd()}${stub}`
+  }
+  return out
+}
+
+export function syncPascalWithForm(form) {
+  if (!form) return ''
+  let source = form.code || buildPascalUnit(form)
+  source = source.replace(/^\s*unit\s+\w+\s*;/mi, `unit ${form.unitName};`)
+  source = source.replace(/^\s*var\s*\n\s*\w+\s*:\s*\w+\s*;/mi, `var\n  ${form.name}: ${form.className};`)
+  source = replaceClassDeclaration(source, form)
+  source = ensureHandlerImplementations(source, form)
+  form.code = source
+  return source
+}
+
+export function completeDelphiBlock(lineHead, indent) {
+  const trimmed = lineHead.trim().toLowerCase()
+  if (trimmed === 'begin') return { text: `\n${indent}  \n${indent}end;`, caretBack: (`\n${indent}end;`).length }
+  if (trimmed === 'try') return { text: `\n${indent}  \n${indent}finally\n${indent}  \n${indent}end;`, caretBack: (`\n${indent}finally\n${indent}  \n${indent}end;`).length }
+  if (trimmed === 'repeat') return { text: `\n${indent}  \n${indent}until ;`, caretBack: (`\n${indent}until ;`).length }
+  if (/^case\b.*\bof$/.test(trimmed)) return { text: `\n${indent}  \n${indent}end;`, caretBack: (`\n${indent}end;`).length }
+  if (/\bthen$/.test(trimmed) || /\bdo$/.test(trimmed)) return { text: `\n${indent}  `, caretBack: 0 }
+  return { text: `\n${indent}`, caretBack: 0 }
+}
+
 function collectHandlers(form) {
   const seen = new Set()
   const out = []
@@ -278,8 +397,7 @@ function collectHandlers(form) {
   return out
 }
 
-export function generatePascal(form) {
-  if (form.code) return form.code
+function buildPascalUnit(form) {
   const handlers = collectHandlers(form)
   const lines = [
     `unit ${form.unitName};`,
@@ -320,4 +438,8 @@ export function generatePascal(form) {
   }
   lines.push('end.')
   return lines.join('\n')
+}
+
+export function generatePascal(form) {
+  return syncPascalWithForm(form)
 }

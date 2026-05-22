@@ -5,7 +5,7 @@ import {
 import { COMPONENT_DEFS, COMMON_PROPS, DEFAULT_EVENT, MENU_DEFS, NEW_SUBMENU } from './data.js'
 import { renderApp } from './main.js'
 import { startProgram, stopProgram } from './runtime.js'
-import { generatePascal } from './pascal.js'
+import { generatePascal, renameIdentifierInCode, syncPascalWithForm } from './pascal.js'
 import { compilePascal } from './compiler.js'
 
 export function uniqueComponentName(form, type) {
@@ -41,6 +41,7 @@ export function addComponent(form, type, x, y) {
     props, events: {},
   }
   form.components.push(comp)
+  if (form.code) syncPascalWithForm(form)
   state.selection = [id]
   state.modified = true
   return comp
@@ -50,6 +51,7 @@ export function deleteSelection() {
   const f = activeForm()
   if (!f || isFormSelected()) return
   f.components = f.components.filter((c) => !state.selection.includes(c.id))
+  if (f.code) syncPascalWithForm(f)
   state.selection = [f.name]
   state.modified = true
 }
@@ -80,7 +82,10 @@ export function createHandlerForComponent(comp, form) {
     // Preserve any user edits — splice a stub into the existing source.
     // If `form.code` is null we don't touch it: the next render generates
     // fresh source that already includes the new procedure.
-    if (form.code) form.code = injectHandlerStub(form.code, form, handlerName)
+    if (form.code) {
+      form.code = injectHandlerStub(form.code, form, handlerName)
+      syncPascalWithForm(form)
+    }
     state.modified = true
   }
   return handlerName
@@ -101,6 +106,7 @@ export function pasteClipboard() {
     f.components.push(fresh)
     newIds.push(fresh.id)
   }
+  if (f.code) syncPascalWithForm(f)
   state.selection = newIds
   state.modified = true
 }
@@ -272,6 +278,15 @@ export function executeMenu(label) {
   state.menuOpen = null
   state.subMenuOpen = null
   const clean = label.split('|')[0].trim().replace(/\.\.\.$/, '').replace(/ ▶$/, '')
+  const editorCommands = {
+    Undo: 'undo',
+    Redo: 'redo',
+    'Select All': 'select-all',
+    Find: 'find',
+    'Search Again': 'find-next',
+    'Go to Line Number': 'go-line',
+  }
+  if (editorCommands[clean] && state.designerView === 'code' && window.onDelphiEditorCommand?.(editorCommands[clean])) return false
   switch (clean) {
     case 'New': newForm(); break
     // New ▶ sub-menu entries
@@ -340,7 +355,7 @@ export function executeMenu(label) {
     case 'Welcome Page': openWelcomeTab(); break
     case 'About Embarcadero® Delphi':
     case 'About Embarcadero RAD Studio':
-      alert('RAD Studio 12 Athens (Web Prototype)\nVCL Form Designer · Object Inspector · Pascal Editor')
+      alert('RAD Studio 13 Florence (Web Prototype)\nVCL Form Designer · Object Inspector · Pascal Editor')
       return false
     default: state.statusMessage = clean
   }
@@ -355,8 +370,13 @@ export function applyProp(selected, isForm, name, raw) {
   if (isForm) {
     if (name === 'Name') {
       const old = f.name
+      const oldClass = f.className
       f.name = raw
       f.className = `T${raw}`
+      if (f.code) {
+        f.code = renameIdentifierInCode(renameIdentifierInCode(f.code, oldClass, f.className), old, raw)
+        syncPascalWithForm(f)
+      }
       state.selection = state.selection.map((s) => (s === old ? raw : s))
       return
     }
@@ -372,6 +392,15 @@ export function applyProp(selected, isForm, name, raw) {
   if (name === 'Name') {
     const old = selected.id
     selected.id = raw
+    if (f.code) f.code = renameIdentifierInCode(f.code, old, raw)
+    for (const [eventName, handler] of Object.entries(selected.events || {})) {
+      if (handler.startsWith(old)) {
+        const renamed = `${raw}${handler.slice(old.length)}`
+        selected.events[eventName] = renamed
+        if (f.code) f.code = renameIdentifierInCode(f.code, handler, renamed)
+      }
+    }
+    if (f.code) syncPascalWithForm(f)
     state.selection = state.selection.map((s) => (s === old ? raw : s))
     return
   }

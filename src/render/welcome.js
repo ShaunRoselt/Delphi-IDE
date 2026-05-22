@@ -27,7 +27,7 @@ const LEARN_ITEMS = [
   ['FireMonkey Animation System', 'Create fluid transitions and animations with TAnimation.'],
   ['LiveBindings in FMX', 'Connect UI controls to data sources without boilerplate code.'],
   ['Cross-Platform File & Camera', 'Access the file system, camera, and sensors on all FMX platforms.'],
-  ['RAD Studio 12 Athens', 'New language, editor, and FireMonkey productivity features.'],
+  ['RAD Studio 13 Florence', 'New language, editor, and FireMonkey productivity features.'],
 ]
 
 const GETIT_ITEMS = [
@@ -46,7 +46,7 @@ export function renderWelcomePage() {
     <section class="welcome-page">
       <header class="welcome-top">
         <div class="rad-logo">D</div>
-        <h1>Welcome to RAD Studio 12 Athens</h1>
+        <h1>Welcome to RAD Studio 13 Florence</h1>
         <nav>
           <button type="button">Extend the IDE</button>
           <button type="button">Manage Features</button>

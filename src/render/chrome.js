@@ -6,8 +6,8 @@ export function renderTitleBar() {
   const f = activeForm()
   const projectName = state.project?.name || 'Project1'
   const title = f
-    ? `${projectName} - ${f.unitName}.pas - ${f.className} - RAD Studio 12 Web Prototype${state.modified ? ' *' : ''}`
-    : `${projectName} - RAD Studio 12 Web Prototype`
+    ? `${projectName} - ${f.unitName}.pas - ${f.className} - RAD Studio 13 Florence Web Prototype${state.modified ? ' *' : ''}`
+    : `${projectName} - RAD Studio 13 Florence Web Prototype`
   return `
     <header class="titlebar">
       <div class="app-badge">RAD</div>
