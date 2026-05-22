@@ -53,6 +53,13 @@ export function startProgram() {
     })),
     formCode: source,
   }
+  state.runtimeWindow = {
+    x: Math.max(20, (window.innerWidth - f.width) / 2 - 60),
+    y: Math.max(20, (window.innerHeight - f.height) / 2 - 60),
+    width: f.width,
+    height: f.height,
+    minimized: false,
+  }
   try {
     currentProgram = makeProgram(source, makeHost())
     state.statusMessage = `${f.className} running`

@@ -60,6 +60,7 @@ export function defaultState() {
     clipboard: null,
     runDialog: null,
     running: null,
+    runtimeWindow: null,
     diagnostics: [],
     quickEditOpen: false,
     contextMenu: null,
@@ -81,6 +82,7 @@ function loadState() {
     parsed.searchSelectedIndex = 0
     parsed.runDialog = null
     parsed.running = null
+    parsed.runtimeWindow = null
     parsed.diagnostics = []
     parsed.quickEditOpen = false
     parsed.contextMenu = null

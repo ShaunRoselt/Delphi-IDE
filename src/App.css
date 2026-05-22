@@ -2255,57 +2255,66 @@ button {
   display: none;
 }
 
-/* ─── Runtime (live form preview) ──────────────────────────────────────── */
-
-.runtime-overlay {
+/* ─── Floating Runtime Window ──────────────────────────────────────────── */
+.runtime-floatwin {
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  display: grid;
-  place-items: center;
   z-index: 600;
-}
-
-.runtime-window {
   display: grid;
   grid-template-rows: 31px minmax(0, 1fr);
   background: #f0f0f0;
-  border: 1px solid #4d6474;
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5);
+  border: 1px solid #7a9ab0;
+  border-radius: 4px 4px 0 0;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.3);
+  overflow: visible;
+  min-width: 140px;
+  min-height: 62px;
+  user-select: none;
 }
 
-.runtime-caption {
+.runtime-floatwin.minimized {
+  grid-template-rows: 31px 0;
+  height: 31px !important;
+  overflow: hidden;
+}
+
+.runtime-floatwin-caption {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 0 9px;
-  background: linear-gradient(#eef6fc, #d9eaf6 55%, #c8deef);
-  border-bottom: 1px solid #9fb9cc;
-  color: #1d252c;
-  font-size: 12px;
-  user-select: none;
+  background: linear-gradient(#bfd4e8, #a8c3db 55%, #94b3cc);
+  border-bottom: 1px solid #7a9ab0;
+  border-radius: 3px 3px 0 0;
+  color: #2a3540;
+  font: 12px "Segoe UI", Tahoma, sans-serif;
+  cursor: move;
 }
 
-.runtime-title {
+.runtime-floatwin-caption .runtime-title {
   flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-weight: 600;
 }
 
-.runtime-caption .form-buttons {
-  margin-left: auto;
-}
-
-.runtime-caption .form-buttons button {
+.runtime-floatwin-caption .form-buttons button {
   width: 30px;
   height: 18px;
-  border: 1px solid #96aebb;
+  border: 1px solid #7a9ab0;
   border-radius: 2px;
-  color: #596b75;
-  background: linear-gradient(#f8fbfd, #d4e3ee);
+  color: #2a3540;
+  background: linear-gradient(#d4e8f8, #b8d4ec);
   font-size: 12px;
   line-height: 1;
+  cursor: pointer;
 }
 
-.runtime-caption .form-buttons button[data-runtime-action="stop"]:hover {
+.runtime-floatwin-caption .form-buttons button:hover {
+  background: linear-gradient(#e4f0fa, #cce0f4);
+}
+
+.runtime-floatwin-caption .form-buttons button[data-floatwin-action="stop"]:hover {
   background: #d33d3d;
   color: #ffffff;
   border-color: #b02828;
@@ -2316,6 +2325,20 @@ button {
   overflow: hidden;
   font: 12px "Segoe UI", Tahoma, sans-serif;
 }
+
+/* Resize handles */
+.fw-resize {
+  position: absolute;
+  z-index: 10;
+}
+.fw-n  { top: -4px;    left: 10px;   right: 10px;  height: 8px;  cursor: n-resize; }
+.fw-s  { bottom: -4px; left: 10px;   right: 10px;  height: 8px;  cursor: s-resize; }
+.fw-e  { right: -4px;  top: 10px;    bottom: 10px; width: 8px;   cursor: e-resize; }
+.fw-w  { left: -4px;   top: 10px;    bottom: 10px; width: 8px;   cursor: w-resize; }
+.fw-ne { top: -4px;    right: -4px;  width: 14px;  height: 14px; cursor: ne-resize; }
+.fw-nw { top: -4px;    left: -4px;   width: 14px;  height: 14px; cursor: nw-resize; }
+.fw-se { bottom: -4px; right: -4px;  width: 14px;  height: 14px; cursor: se-resize; }
+.fw-sw { bottom: -4px; left: -4px;   width: 14px;  height: 14px; cursor: sw-resize; }
 
 .rt-btn {
   border: 1px solid #a8a8a8;

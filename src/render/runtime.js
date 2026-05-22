@@ -15,22 +15,35 @@ function renderRuntimeControl(c) {
 export function renderRuntime() {
   if (!state.running) return ''
   const r = state.running
+  const w = state.runtimeWindow
+  if (!w) return ''
+
+  const minimized = w.minimized
+  const clientStyle = minimized ? ' style="display:none"' : ''
+  const winClass = minimized ? 'runtime-floatwin minimized' : 'runtime-floatwin'
+
   return `
-    <div class="runtime-overlay">
-      <div class="runtime-window" style="width:${r.width}px;height:${r.height + 31}px">
-        <header class="runtime-caption">
-          <span class="form-icon">D</span>
-          <span class="runtime-title">${escapeHtml(r.caption)}</span>
-          <span class="form-buttons">
-            <button type="button" title="Minimize">−</button>
-            <button type="button" title="Maximize">□</button>
-            <button type="button" title="Stop" data-runtime-action="stop">×</button>
-          </span>
-        </header>
-        <div class="runtime-client" style="background:${colorToCss(r.color)}">
-          ${r.components.map(renderRuntimeControl).join('')}
+    <div class="${winClass}" data-floatwin style="left:${w.x}px;top:${w.y}px;width:${w.width}px;height:${w.height + 31}px">
+      <header class="runtime-floatwin-caption" data-floatwin-drag>
+        <span class="form-icon">D</span>
+        <span class="runtime-title">${escapeHtml(r.caption)}</span>
+        <div class="form-buttons">
+          <button type="button" title="Minimize" data-floatwin-action="minimize">−</button>
+          <button type="button" title="Maximize" data-floatwin-action="maximize">□</button>
+          <button type="button" title="Stop/Close" data-floatwin-action="stop">×</button>
         </div>
+      </header>
+      <div class="runtime-client"${clientStyle} style="background:${colorToCss(r.color)}">
+        ${r.components.map(renderRuntimeControl).join('')}
       </div>
+      <div class="fw-resize fw-n" data-fw-resize="n"></div>
+      <div class="fw-resize fw-ne" data-fw-resize="ne"></div>
+      <div class="fw-resize fw-e" data-fw-resize="e"></div>
+      <div class="fw-resize fw-se" data-fw-resize="se"></div>
+      <div class="fw-resize fw-s" data-fw-resize="s"></div>
+      <div class="fw-resize fw-sw" data-fw-resize="sw"></div>
+      <div class="fw-resize fw-w" data-fw-resize="w"></div>
+      <div class="fw-resize fw-nw" data-fw-resize="nw"></div>
     </div>
   `
 }
